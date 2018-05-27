@@ -30,8 +30,13 @@ function displayProducts() {
     var query = "SELECT * FROM products";
     connection.query(query, function(err, res) {
       for (var i = 0; i < res.length; i++) {
-        table.push([res[i].item_id, res[i].product_name, res[i].department_name, res[i].price, res[i].stock_quantity]);
-        itemIdArr.push(res[i].item_id);
+        var itemId = res[i].item_id;
+        var productName = res[i].product_name;
+        var departmentName = res[i].department_name;
+        var price = res[i].price;
+        var stockQuantity = res[i].stock_quantity;
+        table.push([itemId, productName, departmentName, price, stockQuantity]);
+        itemIdArr.push(itemId);
       }
     console.log(`\n${table.toString()}\n`);
     promptItemId(itemIdArr);
@@ -78,6 +83,12 @@ function promptItemQuantity(idRes) {
     }
   }])
   .then(function(answer) {
-  console.log(answer);
+    productQuantity = answer.product_quantity;
+    purchaseItem(productName, departmentName, price, stockQuantity, productQuantity);
   });
+}
+
+function purchaseItem(productName, departmentName, price, stockQuanity, productQuanity){
+  console.log(productName,departmentName, price, stockQuanity, productQuanity);
+  connection.end();
 }
