@@ -86,9 +86,8 @@ function promptItemQuantity(idRes) {
     if (qtyRes > stockQuantity) {
       insufficientQuantity(qtyRes, itemId, productName, stockQuantity);
     } else {
-      purchaseItem();
+      purchaseItem(qtyRes, itemId, productName, stockQuantity, price);
     }
-    // purchaseItem(productName, departmentName, price, stockQuantity, productQuantity);
   });
 }
 
@@ -117,8 +116,16 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
     });
 }
 
-// function purchaseItem(productName, departmentName, price, stockQuantity, productQuantity){
-//   console.log(productName,departmentName, price, stockQuantity, productQuantity);
-//   console.log(`\n${table.toString()}\n`);
-//   connection.end();
-// }
+function purchaseItem(qtyRes, idRes, product, stock, price){
+  var newStockQuantity =  stock - qtyRes;
+  console.log(newStockQuantity);
+  var cost = qtyRes * price;
+  console.log(cost);
+  var productName = product;
+  var itemId = idRes[0].item_id;
+  console.log(itemId);
+  var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${itemId}`
+  connection.query(query, function (err, res) {
+    console.log(`Thank you for your purchase. You ordered "${productName}", Qty: ${qtyRes}. Order total: ${cost}`);
+  })
+}
