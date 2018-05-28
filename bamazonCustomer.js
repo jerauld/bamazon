@@ -100,7 +100,7 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
     name: "proceed_response",
     type: "rawlist",
     message: `Sorry. We have insufficient quantity available to fulfill the order of ${productQuantity} ${productName}. There are currently ${stockQuantity} ${productName} in stock. How would you like to proceed?`,
-    choices: ["Re-enter the Quantity", "Select a Different Item", "Cancel Order"]
+    choices: ["Re-enter the Quantity", "Select a Different Item", "Cancel Order Entirely"]
   }])
     .then(function(answer) {
       var response = answer.proceed_response;
@@ -110,7 +110,7 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
         console.log(`\n${table.toString()}\n`);
         promptItemId(itemIdArr);
       } else {
-        console.log('Thank you for shopping with us. We look forward to being of service again soon!');
+        console.log(`\nThank you for shopping with us. We look forward to being of service again soon!\n`);
         connection.end();
       }
     });
@@ -118,14 +118,30 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
 
 function purchaseItem(qtyRes, idRes, product, stock, price){
   var newStockQuantity =  stock - qtyRes;
-  console.log(newStockQuantity);
   var cost = qtyRes * price;
-  console.log(cost);
   var productName = product;
   var itemId = idRes[0].item_id;
-  console.log(itemId);
   var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${itemId}`
   connection.query(query, function (err, res) {
-    console.log(`Thank you for your purchase. You ordered "${productName}", Qty: ${qtyRes}. Order total: ${cost}`);
+    console.log(`\nThank you for your purchase. You ordered "${productName}", Qty: ${qtyRes}. Order total: ${cost}\n`);
+    keepShopping();
   })
+}
+
+function keepShopping() {
+  inquirer.prompt([{
+      name: "continue_response",
+      type: "rawlist",
+      message: `Would you like to continue shopping?`,
+      choices: ["Yes", "No"]
+    }])
+    .then(function(answer) {
+      if (answer.continue_response === `Yes`) {
+        console.log(`\n${table.toString()}\n`);
+        promptItemId(itemIdArr);
+      } else {
+        console.log(`\nThank you for shopping with us. We look forward to being of service again soon!\n`);
+        connection.end();
+      }
+    });
 }
