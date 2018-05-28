@@ -1,9 +1,10 @@
 var mysql = require("mysql");
 var Table = require('cli-table');
 var inquirer = require("inquirer");
+var itemIdArr = [];
 
 var table = new Table({
-    head: ['item_id', 'product_name', 'department_name', 'price', 'stock_quantity'], 
+    head: ['Item ID', 'Product Name', 'Price'], 
     style: {
       head:[], 
       border:[], 
@@ -26,7 +27,6 @@ connection.connect(function(err) {
 });
 
 function displayProducts() {
-    var itemIdArr = [];
     var query = "SELECT * FROM products";
     connection.query(query, function(err, res) {
       for (var i = 0; i < res.length; i++) {
@@ -35,7 +35,7 @@ function displayProducts() {
         var departmentName = res[i].department_name;
         var price = res[i].price;
         var stockQuantity = res[i].stock_quantity;
-        table.push([itemId, productName, departmentName, price, stockQuantity]);
+        table.push([itemId, productName, price]);
         itemIdArr.push(itemId);
       }
     console.log(`\n${table.toString()}\n`);
@@ -64,12 +64,11 @@ function promptItemId(arr) {
     });
 }
 
-
 function promptItemQuantity(idRes) {
   var productName = idRes[0].product_name;
-  var departmentName = idRes[0].department_name;
   var price = idRes[0].price;
   var stockQuantity = idRes[0].stock_quantity;
+  var itemId = idRes;
   inquirer.prompt([{
     name: "product_quantity",
     type: "input",
@@ -83,12 +82,43 @@ function promptItemQuantity(idRes) {
     }
   }])
   .then(function(answer) {
-    productQuantity = answer.product_quantity;
-    purchaseItem(productName, departmentName, price, stockQuantity, productQuantity);
+    var qtyRes = answer.product_quantity;
+    if (qtyRes > stockQuantity) {
+      insufficientQuantity(qtyRes, itemId, productName, stockQuantity);
+    } else {
+      purchaseItem();
+    }
+    // purchaseItem(productName, departmentName, price, stockQuantity, productQuantity);
   });
 }
 
-function purchaseItem(productName, departmentName, price, stockQuanity, productQuanity){
-  console.log(productName,departmentName, price, stockQuanity, productQuanity);
-  connection.end();
+function insufficientQuantity(qtyRes, idRes, product, stock) {
+  var productQuantity = qtyRes;
+  var itemId = idRes;
+  var productName = product;
+  var stockQuantity = stock;
+  inquirer.prompt([{
+    name: "proceed_response",
+    type: "rawlist",
+    message: `Sorry. We have insufficient quantity available to fulfill the order of ${productQuantity} ${productName}. There are currently ${stockQuantity} ${productName} in stock. How would you like to proceed?`,
+    choices: ["Re-enter the Quantity", "Select a Different Item", "Cancel Order"]
+  }])
+    .then(function(answer) {
+      var response = answer.proceed_response;
+      if (response === 'Re-enter the Quantity'){
+          promptItemQuantity(itemId);
+      } else if (response === 'Select a Different Item') {
+        console.log(`\n${table.toString()}\n`);
+        promptItemId(itemIdArr);
+      } else {
+        console.log('Thank you for shopping with us. We look forward to being of service again soon!');
+        connection.end();
+      }
+    });
 }
+
+// function purchaseItem(productName, departmentName, price, stockQuantity, productQuantity){
+//   console.log(productName,departmentName, price, stockQuantity, productQuantity);
+//   console.log(`\n${table.toString()}\n`);
+//   connection.end();
+// }
