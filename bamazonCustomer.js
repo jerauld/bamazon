@@ -86,7 +86,7 @@ function promptItemQuantity(idRes) {
     if (qtyRes > stockQuantity) {
       insufficientQuantity(qtyRes, itemId, productName, stockQuantity);
     } else {
-      purchaseItem(qtyRes, itemId, productName, stockQuantity, price);
+      orderConfirm(qtyRes, itemId, productName, stockQuantity, price);
     }
   });
 }
@@ -116,6 +116,29 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
     });
 }
 
+function orderConfirm(qtyRes, idRes, product, stock, price){
+  var productName = idRes[0].product_name;
+  var price = idRes[0].price;
+  var stockQuantity = idRes[0].stock_quantity;
+  var itemId = idRes;
+  var cost = qtyRes * price;
+  console.log(`\nOrder Summary: Item:"${productName}", Qty: ${qtyRes}. Order total: ${cost}\n`);
+  inquirer.prompt([{
+    name: "confirm_response",
+    type: "rawlist",
+    message: `Review your order.`,
+    choices: ["Place your order.", "Cancel your order."]
+  }])
+  .then(function(answer) {
+    if (answer.confirm_response === `Place your order.`) {
+      purchaseItem(qtyRes, itemId, productName, stockQuantity, price);
+    } else {
+      console.log(`\nYour order has been cancelled.\n`);
+      keepShopping();
+    }
+  });
+}
+
 function purchaseItem(qtyRes, idRes, product, stock, price){
   var newStockQuantity =  stock - qtyRes;
   var cost = qtyRes * price;
@@ -123,7 +146,7 @@ function purchaseItem(qtyRes, idRes, product, stock, price){
   var itemId = idRes[0].item_id;
   var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${itemId}`
   connection.query(query, function (err, res) {
-    console.log(`\nThank you for your purchase. You ordered "${productName}", Qty: ${qtyRes}. Order total: ${cost}\n`);
+    console.log(`\nThank you for your purchase. You ordered "${productName}". Order total: ${cost}\n`);
     keepShopping();
   })
 }
