@@ -2,21 +2,26 @@ var mysql = require("mysql");
 var Table = require('cli-table');
 var inquirer = require("inquirer");
 var colors = require('colors');
+var header = require("./javascript_modules/header.js");
 var itemIdArr = [];
+var tableHead = [];
+var table;
 
-var table = new Table({
-    head: ['Item ID'.bold, 'Product Name'.bold, 'Price'.bold], 
-    style: {
+function newTable(tableHead){
+  table = new Table({
+      head: tableHead, 
+      style: {
       head:[], 
       border:[], 
       'padding-left': 1, 
       'padding-right': 1
-    },
-    chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
-         , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
-         , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
-         , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
+      },
+      chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
+          , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
+          , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
+          , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
   });
+}
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -28,60 +33,45 @@ var connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  displayProducts();
+  header.bamazonHeader(false, null);
+  displayProducts("SELECT * FROM products");
 });
 
-function bamazonHeader() {
-  console.log(`
-                                                                  
-  ██████   █████  ███    ███  █████  ███████  ██████  ███    ██   
-  ██   ██ ██   ██ ████  ████ ██   ██    ███  ██    ██ ████   ██   
-  ██████  ███████ ██ ████ ██ ███████   ███   ██    ██ ██ ██  ██   
-  ██   ██ ██   ██ ██  ██  ██ ██   ██  ███    ██    ██ ██  ██ ██   
-  ██████  ██   ██ ██      ██ ██   ██ ███████  ██████  ██   ████   `);
-    console.log(`               ------------------------->`.yellow.bold);
-}
 
-function displayOrderSummary(qtyRes, productName, price, cost) {
+function displayOrderSummary(qty, product, price, cost) {
   console.log("\n\n Order Summary".bold.yellow);
   console.log("════════════════════════════════════════════════════════════════════════════════".yellow)
-  console.log(" Qty: ".bold + qtyRes.cyan.bold + " | ".yellow + "Product: ".bold + productName.cyan.bold + " | ".yellow + "Price: ".bold + "$"+price);
+  console.log(" Qty: ".bold + qty.cyan.bold + " | ".yellow + "Product: ".bold + product.cyan.bold + " | ".yellow + "Price: ".bold + "$"+price);
   console.log("--------------------------------------------------------------------------------".yellow)
   console.log(" Order Total: ".bold.yellow + "$"+cost.toFixed(2) + "\n\n");
 }
 
-function displayPurchaseConfirmation(qtyRes, productName, price, cost) {
+function displayPurchaseConfirmation(qty, product, price, cost) {
   console.log("\n\n Thank you for your purchase".bold.green);
   console.log("════════════════════════════════════════════════════════════════════════════════".green)
-  console.log(` You ordered "${productName.cyan.bold}", Qty: ${qtyRes}. Order total: ${cost.toFixed(2)}\n\n`.bold);
+  console.log(` You ordered "${product.cyan.bold}", Qty: ${qty}. Order total: ${cost.toFixed(2)}\n\n`.bold);
 }
 
-function displayProducts() {
-    var query = "SELECT * FROM products";
-    connection.query(query, function(err, res) {
+function displayProducts(param) {
+    tableHead = ['Item ID'.bold, 'Product Name'.bold, 'Price'.bold];
+    newTable(tableHead);
+    connection.query(param, function(err, res) {
       for (var i = 0; i < res.length; i++) {
-        var itemId = res[i].item_id;
-        var productName = res[i].product_name;
-        var departmentName = res[i].department_name;
-        var price = res[i].price;
-        var stockQuantity = res[i].stock_quantity;
-        table.push([itemId, productName, "$"+price]);
-        itemIdArr.push(itemId);
+        table.push([res[i].item_id, res[i].product_name, `$${res[i].price}`]);
+        itemIdArr.push(res[i].item_id);
       }
-    bamazonHeader();
     console.log(`\n${table.toString()}\n`);
     promptItemId(itemIdArr);
     });
 }
 
 function promptItemId(arr) {
-  var itemIdArr = arr;
   inquirer.prompt([{
       name: "item_id",
       type: "input",
       message: "Enter the ID of the product you would like to buy: ",
       validate: function(value){
-        if(itemIdArr.includes(parseInt(value))){
+        if(arr.includes(parseInt(value))){
           return true;
         }
         return "Enter a valid ID!";
@@ -95,15 +85,11 @@ function promptItemId(arr) {
     });
 }
 
-function promptItemQuantity(idRes) {
-  var productName = idRes[0].product_name;
-  var price = idRes[0].price;
-  var stockQuantity = idRes[0].stock_quantity;
-  var itemId = idRes;
+function promptItemQuantity(id) {
   inquirer.prompt([{
     name: "product_quantity",
     type: "input",
-    message: `Enter the quantity of ${productName.cyan.bold} you would like: `,
+    message: `Enter the quantity of ${id[0].product_name.cyan.bold} you would like: `,
     validate: function(value){
       if(!isNaN(value) && value > 0){
         return true;
@@ -113,31 +99,25 @@ function promptItemQuantity(idRes) {
     }
   }])
   .then(function(answer) {
-    var qtyRes = answer.product_quantity;
-    if (qtyRes > stockQuantity) {
-      insufficientQuantity(qtyRes, itemId, productName, stockQuantity);
+    if (answer.product_quantity > id[0].stock_quantity) {
+      insufficientQuantity(answer.product_quantity, id, id[0].product_name, id[0].stock_quantity);
     } else {
-      orderConfirm(qtyRes, itemId, productName, stockQuantity, price);
+      orderConfirm(answer.product_quantity, id, id[0].product_name, id[0].stock_quantity, id[0].price);
     }
   });
 }
 
-function insufficientQuantity(qtyRes, idRes, product, stock) {
-  var productQuantity = qtyRes;
-  var itemId = idRes;
-  var productName = product;
-  var stockQuantity = stock;
+function insufficientQuantity(qty, id, product, stock) {
   inquirer.prompt([{
     name: "proceed_response",
     type: "rawlist",
-    message: `Sorry. We have insufficient quantity available to fulfill the order of ${productQuantity.yellow} ${productName.cyan}.`.red + ` There are currently ${stockQuantity} ${productName.cyan} in stock. How would you like to proceed?`,
+    message: `Sorry. We have insufficient quantity available to fulfill the order of ${qty} ${product}.`.red + ` There are currently ${stock} ${product} in stock.`.green + `How would you like to proceed?`,
     choices: ["Re-enter the Quantity", "Select a Different Item", "Cancel Order Entirely"]
   }])
     .then(function(answer) {
-      var response = answer.proceed_response;
-      if (response === 'Re-enter the Quantity'){
-          promptItemQuantity(itemId);
-      } else if (response === 'Select a Different Item') {
+      if (answer.proceed_response === 'Re-enter the Quantity'){
+          promptItemQuantity(id);
+      } else if (answer.proceed_response === 'Select a Different Item') {
         console.log(`\n${table.toString()}\n`);
         promptItemId(itemIdArr);
       } else {
@@ -147,13 +127,9 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
     });
 }
 
-function orderConfirm(qtyRes, idRes, product, stock, price){
-  var productName = idRes[0].product_name;
-  var price = idRes[0].price;
-  var stockQuantity = idRes[0].stock_quantity;
-  var itemId = idRes;
-  var cost = qtyRes * price;
-  displayOrderSummary(qtyRes, productName, price, cost);
+function orderConfirm(qty, id, product, stock, price){
+  var cost = qty * price;
+  header.displayReview("confirmation", "Order Summary", qty, product, price, cost)
   inquirer.prompt([{
     name: "confirm_response",
     type: "rawlist",
@@ -162,7 +138,7 @@ function orderConfirm(qtyRes, idRes, product, stock, price){
   }])
   .then(function(answer) {
     if (answer.confirm_response === `Place your order.`) {
-      purchaseItem(qtyRes, itemId, productName, stockQuantity, price);
+      purchaseItem(qty, id, product, stock, price);
     } else {
       console.log(`\n Your order has been cancelled.\n`.bold.red);
       keepShopping();
@@ -170,14 +146,12 @@ function orderConfirm(qtyRes, idRes, product, stock, price){
   });
 }
 
-function purchaseItem(qtyRes, idRes, product, stock, price){
-  var newStockQuantity =  stock - qtyRes;
-  var cost = qtyRes * price;
-  var productName = product;
-  var itemId = idRes[0].item_id;
-  var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${itemId}`
+function purchaseItem(qty, id, product, stock, price){
+  var newStockQuantity =  stock - qty;
+  var cost = qty * price;
+  var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${id[0].item_id}`
   connection.query(query, function (err, res) {
-    displayPurchaseConfirmation(qtyRes, productName, price, cost);
+    header.displayReview("summary", "Thank You For Your Purchase", qty, product, null, cost)
     keepShopping();
   })
 }
