@@ -1,16 +1,21 @@
 var mysql = require("mysql");
 var Table = require('cli-table');
 var inquirer = require("inquirer");
+var colors = require('colors');
 var itemIdArr = [];
 
 var table = new Table({
-    head: ['Item ID', 'Product Name', 'Price'], 
+    head: ['Item ID'.bold, 'Product Name'.bold, 'Price'.bold], 
     style: {
       head:[], 
       border:[], 
       'padding-left': 1, 
       'padding-right': 1
-    }
+    },
+    chars: { 'top': '═' , 'top-mid': '╤' , 'top-left': '╔' , 'top-right': '╗'
+         , 'bottom': '═' , 'bottom-mid': '╧' , 'bottom-left': '╚' , 'bottom-right': '╝'
+         , 'left': '║' , 'left-mid': '╟' , 'mid': '─' , 'mid-mid': '┼'
+         , 'right': '║' , 'right-mid': '╢' , 'middle': '│' }
   });
 
 var connection = mysql.createConnection({
@@ -26,6 +31,31 @@ connection.connect(function(err) {
   displayProducts();
 });
 
+function bamazonHeader() {
+  console.log(`
+                                                                  
+  ██████   █████  ███    ███  █████  ███████  ██████  ███    ██   
+  ██   ██ ██   ██ ████  ████ ██   ██    ███  ██    ██ ████   ██   
+  ██████  ███████ ██ ████ ██ ███████   ███   ██    ██ ██ ██  ██   
+  ██   ██ ██   ██ ██  ██  ██ ██   ██  ███    ██    ██ ██  ██ ██   
+  ██████  ██   ██ ██      ██ ██   ██ ███████  ██████  ██   ████   `);
+    console.log(`               ------------------------->`.yellow.bold);
+}
+
+function displayOrderSummary(qtyRes, productName, price, cost) {
+  console.log("\n\n Order Summary".bold.yellow);
+  console.log("════════════════════════════════════════════════════════════════════════════════".yellow)
+  console.log(" Qty: ".bold + qtyRes.cyan.bold + " | ".yellow + "Product: ".bold + productName.cyan.bold + " | ".yellow + "Price: ".bold + "$"+price);
+  console.log("--------------------------------------------------------------------------------".yellow)
+  console.log(" Order Total: ".bold.yellow + "$"+cost.toFixed(2) + "\n\n");
+}
+
+function displayPurchaseConfirmation(qtyRes, productName, price, cost) {
+  console.log("\n\n Thank you for your purchase".bold.green);
+  console.log("════════════════════════════════════════════════════════════════════════════════".green)
+  console.log(` You ordered "${productName.cyan.bold}", Qty: ${qtyRes}. Order total: ${cost.toFixed(2)}\n\n`.bold);
+}
+
 function displayProducts() {
     var query = "SELECT * FROM products";
     connection.query(query, function(err, res) {
@@ -35,9 +65,10 @@ function displayProducts() {
         var departmentName = res[i].department_name;
         var price = res[i].price;
         var stockQuantity = res[i].stock_quantity;
-        table.push([itemId, productName, price]);
+        table.push([itemId, productName, "$"+price]);
         itemIdArr.push(itemId);
       }
+    bamazonHeader();
     console.log(`\n${table.toString()}\n`);
     promptItemId(itemIdArr);
     });
@@ -72,7 +103,7 @@ function promptItemQuantity(idRes) {
   inquirer.prompt([{
     name: "product_quantity",
     type: "input",
-    message: `Enter the quantity of ${productName} you would like: `,
+    message: `Enter the quantity of ${productName.cyan.bold} you would like: `,
     validate: function(value){
       if(!isNaN(value) && value > 0){
         return true;
@@ -99,7 +130,7 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
   inquirer.prompt([{
     name: "proceed_response",
     type: "rawlist",
-    message: `Sorry. We have insufficient quantity available to fulfill the order of ${productQuantity} ${productName}. There are currently ${stockQuantity} ${productName} in stock. How would you like to proceed?`,
+    message: `Sorry. We have insufficient quantity available to fulfill the order of ${productQuantity.yellow} ${productName.cyan}.`.red + ` There are currently ${stockQuantity} ${productName.cyan} in stock. How would you like to proceed?`,
     choices: ["Re-enter the Quantity", "Select a Different Item", "Cancel Order Entirely"]
   }])
     .then(function(answer) {
@@ -110,7 +141,7 @@ function insufficientQuantity(qtyRes, idRes, product, stock) {
         console.log(`\n${table.toString()}\n`);
         promptItemId(itemIdArr);
       } else {
-        console.log(`\nThank you for shopping with us. We look forward to being of service again soon!\n`);
+        console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.yellow);
         connection.end();
       }
     });
@@ -122,7 +153,7 @@ function orderConfirm(qtyRes, idRes, product, stock, price){
   var stockQuantity = idRes[0].stock_quantity;
   var itemId = idRes;
   var cost = qtyRes * price;
-  console.log(`\nOrder Summary: Item:"${productName}", Qty: ${qtyRes}. Order total: ${cost}\n`);
+  displayOrderSummary(qtyRes, productName, price, cost);
   inquirer.prompt([{
     name: "confirm_response",
     type: "rawlist",
@@ -133,7 +164,7 @@ function orderConfirm(qtyRes, idRes, product, stock, price){
     if (answer.confirm_response === `Place your order.`) {
       purchaseItem(qtyRes, itemId, productName, stockQuantity, price);
     } else {
-      console.log(`\nYour order has been cancelled.\n`);
+      console.log(`\n Your order has been cancelled.\n`.bold.red);
       keepShopping();
     }
   });
@@ -146,7 +177,7 @@ function purchaseItem(qtyRes, idRes, product, stock, price){
   var itemId = idRes[0].item_id;
   var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${itemId}`
   connection.query(query, function (err, res) {
-    console.log(`\nThank you for your purchase. You ordered "${productName}". Order total: ${cost}\n`);
+    displayPurchaseConfirmation(qtyRes, productName, price, cost);
     keepShopping();
   })
 }
@@ -163,7 +194,7 @@ function keepShopping() {
         console.log(`\n${table.toString()}\n`);
         promptItemId(itemIdArr);
       } else {
-        console.log(`\nThank you for shopping with us. We look forward to being of service again soon!\n`);
+        console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.yellow);
         connection.end();
       }
     });
