@@ -37,21 +37,6 @@ connection.connect(function(err) {
   displayProducts("SELECT * FROM products");
 });
 
-
-function displayOrderSummary(qty, product, price, cost) {
-  console.log("\n\n Order Summary".bold.yellow);
-  console.log("════════════════════════════════════════════════════════════════════════════════".yellow)
-  console.log(" Qty: ".bold + qty.cyan.bold + " | ".yellow + "Product: ".bold + product.cyan.bold + " | ".yellow + "Price: ".bold + "$"+price);
-  console.log("--------------------------------------------------------------------------------".yellow)
-  console.log(" Order Total: ".bold.yellow + "$"+cost.toFixed(2) + "\n\n");
-}
-
-function displayPurchaseConfirmation(qty, product, price, cost) {
-  console.log("\n\n Thank you for your purchase".bold.green);
-  console.log("════════════════════════════════════════════════════════════════════════════════".green)
-  console.log(` You ordered "${product.cyan.bold}", Qty: ${qty}. Order total: ${cost.toFixed(2)}\n\n`.bold);
-}
-
 function displayProducts(param) {
     tableHead = ['Item ID'.bold, 'Product Name'.bold, 'Price'.bold];
     newTable(tableHead);
@@ -129,7 +114,7 @@ function insufficientQuantity(qty, id, product, stock) {
 
 function orderConfirm(qty, id, product, stock, price){
   var cost = qty * price;
-  header.displayReview("confirmation", "Order Summary", qty, product, price, cost)
+  header.displayOrder("confirmation", "Order Summary", qty, product, price, cost)
   inquirer.prompt([{
     name: "confirm_response",
     type: "rawlist",
@@ -151,7 +136,7 @@ function purchaseItem(qty, id, product, stock, price){
   var cost = qty * price;
   var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${id[0].item_id}`
   connection.query(query, function (err, res) {
-    header.displayReview("summary", "Thank You For Your Purchase", qty, product, null, cost)
+    header.displayOrder("summary", "Thank You For Your Purchase", qty, product, null, cost)
     keepShopping();
   })
 }
