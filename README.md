@@ -13,6 +13,12 @@ Bamazon was created for the Node.js & MySQL homework assignment for Berkeley Cod
 -npm install inquirer
 -npm install colors
 
+**Walking Through Video**
+(Soon)
+
+**Gifs**
+<img src="/images/bamazonCustomer.gif" width="500px"/>
+
 **Requirements**
 
 - The completed app should utilize a MySql Database called `bamazon`.
