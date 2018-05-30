@@ -4,12 +4,11 @@ var inquirer = require("inquirer");
 var colors = require('colors');
 var header = require("./javascript_modules/header.js");
 var itemIdArr = [];
-var tableHead = [];
 var table;
 
-function newTable(tableHead){
+function newTable(){
   table = new Table({
-      head: tableHead, 
+      head: ['Item ID'.bold, 'Product Name'.bold, 'Price ($)'.bold], 
       style: {
       head:[], 
       border:[], 
@@ -38,8 +37,7 @@ connection.connect(function(err) {
 });
 
 function displayProducts(param) {
-    tableHead = ['Item ID'.bold, 'Product Name'.bold, 'Price ($)'.bold];
-    newTable(tableHead);
+    newTable();
     connection.query(param, function(err, res) {
       if(err) throw err;
       for (var i = 0; i < res.length; i++) {
@@ -108,7 +106,7 @@ function insufficientQuantity(qty, id, product, stock) {
         console.log(`\n${table.toString()}\n\n`);
         promptItemId(itemIdArr);
       } else {
-        console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.yellow);
+        console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.red);
         connection.end();
       }
     });
@@ -157,7 +155,7 @@ function keepShopping() {
         console.log(`\n${table.toString()}\n\n`);
         promptItemId(itemIdArr);
       } else {
-        console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.yellow);
+        console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.red);
         connection.end();
       }
     });
