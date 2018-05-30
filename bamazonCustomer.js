@@ -41,6 +41,7 @@ function displayProducts(param) {
     tableHead = ['Item ID'.bold, 'Product Name'.bold, 'Price'.bold];
     newTable(tableHead);
     connection.query(param, function(err, res) {
+      if(err) throw err;
       for (var i = 0; i < res.length; i++) {
         table.push([res[i].item_id, res[i].product_name, `$${res[i].price}`]);
         itemIdArr.push(res[i].item_id);
@@ -59,12 +60,13 @@ function promptItemId(arr) {
         if(arr.includes(parseInt(value))){
           return true;
         }
-        return "Enter a valid ID!";
+        return "Enter a valid ID.";
       }
     }])
     .then(function(answer) {
       var query = `SELECT * FROM products WHERE item_id="${answer.item_id}"`
       connection.query(query, function (err, res) {
+        if(err) throw err;
         promptItemQuantity(res);
       })
     });
@@ -79,7 +81,7 @@ function promptItemQuantity(id) {
       if(!isNaN(value) && value > 0){
         return true;
       } else {
-        return "Please enter a quantity."
+        return "Enter a valid quantity."
       }
     }
   }])
@@ -136,6 +138,7 @@ function purchaseItem(qty, id, product, stock, price){
   var cost = qty * price;
   var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${id[0].item_id}`
   connection.query(query, function (err, res) {
+    if(err) throw err;
     header.displayOrder("summary", "Thank You For Your Purchase", qty, product, null, cost)
     keepShopping();
   })

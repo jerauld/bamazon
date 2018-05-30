@@ -29,7 +29,6 @@ module.exports = {
   },
 
   displayJob: function(type, message, stock, product, price, newQty, cost) {
-    console.log(stock);
     if (type === "confirmation") {
       console.log(`\n\n ${message}`.bold.yellow);
       console.log("════════════════════════════════════════════════════════════════════════════════════════".yellow)
@@ -44,5 +43,24 @@ module.exports = {
       console.log(" Status: ".bold.green + "Success!");
     }
   },
+
+  displayAdd: function(type, message, product, department, price, quantity) {
+    if (type === "confirmation") { //Ready to Complete
+      console.log(`\n\n ${message}`.bold.yellow);
+      console.log("════════════════════════════════════════════════════════════════════════════════════════".yellow)
+      console.log(" The following product will be added to inventory:".bold + "\n");
+      console.log(" Product Name:".bold.cyan + product);
+      console.log(" Department Name:".bold.cyan + department);
+      console.log(" Price:".bold.cyan + price);
+      console.log(" Product Name:".bold.cyan + quantity + "\n");
+      console.log("----------------------------------------------------------------------------------------\n\n".yellow)
+    } else if ( type === "summary") {
+      console.log(`\n\n ${message}`.bold.green); //Job Compleition
+      console.log("════════════════════════════════════════════════════════════════════════════════════════".green)
+      console.log(" " + product.cyan.bold + " was added to the inventory");
+      console.log("----------------------------------------------------------------------------------------".green)
+      console.log(" Status: ".bold.green + "Success!");
+    }
+  }
 
 }

@@ -56,7 +56,7 @@ function promptOptions() {
                 displayProducts("SELECT * FROM products", true);
                 break
             case 'Add New Product':
-                console.log('View Products for Sale');
+                addPrompt();
                 break
             case 'Quit':
                 connection.end();
@@ -68,6 +68,7 @@ function promptOptions() {
 function displayProducts(param, isAdding) {
     newTable();
     connection.query(param, function(err, res) {
+      if(err) throw err;
       for (var i = 0; i < res.length; i++) {
         var itemId = res[i].item_id;
         var productName = res[i].product_name;
@@ -101,6 +102,7 @@ function promptItemId(arr) {
       .then(function(answer) {
         var query = `SELECT * FROM products WHERE item_id="${answer.item_id}"`
         connection.query(query, function (err, res) {
+          if(err) throw err;
           promptInventoryQuantity(res);
         })
       });
@@ -129,15 +131,15 @@ function jobConfirm(qty, id, product, stock, price){
   var cost = price * qty;
   header.displayJob("confirmation", "Ready to Complete", stock, product, price, newQuantity, cost)
   inquirer.prompt([{
-    name: "confirm_response",
+    name: "confirm_job",
     type: "list",
     message: `Are these changes correct?`,
     choices: ["Confirm and Proceed", "Cancel Job and Select A Different Product", "Return to Manager Options"]
   }])
   .then(function(answer) {
-    if (answer.confirm_response === `Confirm and Proceed`) {
+    if (answer.confirm_job === `Confirm and Proceed`) {
       addStock(qty, newQuantity, id, product, stock, price);
-    } else if (answer.confirm_response === `Cancel Job and Select A Different Product`) {
+    } else if (answer.confirm_job === `Cancel Job and Select A Different Product`) {
       console.log(`\n Your job has been cancelled.\n`.bold.red);
       displayProducts("SELECT * FROM products", true);
     } else {
@@ -150,8 +152,92 @@ function jobConfirm(qty, id, product, stock, price){
 function addStock(qty, newQty, id, product, stock, price){
   var query = `UPDATE products SET stock_quantity=${newQty} WHERE item_id=${id[0].item_id}`
   connection.query(query, function (err, res) {
+    if(err) throw err;
     header.displayJob("summary", "Job Completion", stock, product, price, newQty, null)
     displayProducts(`SELECT * FROM products WHERE item_id=${id[0].item_id}`, false);
   })
 }
 
+function addPrompt(){
+
+  inquirer.prompt([{
+    type: 'input',
+    name: 'product_name',
+    message: 'Enter a name for new product.',
+    validate: function(value) {
+      if (value !== '') {
+        return true
+      }
+      return 'Please enter a name for new product.'
+    }
+  },
+  {
+    type: 'input',
+    name: 'department_name',
+    message: 'Enter a department name for new product.',
+    validate: function(value) {
+      if (value !== '') {
+        return true
+      }
+      return 'Please enter a department name for new product.'
+    }
+  },
+  {
+    type: 'input',
+    name: 'price',
+    message: 'Enter a price for new product.',
+    validate: function(value) {
+      if(!isNaN(value) && value > 0){
+        return true;
+      } else {
+        return "Please enter a price for new product."
+      }
+    }
+  },
+  {
+    type: 'input',
+    name: 'stock_quantity',
+    message: 'Enter a stock quantity for new product.',
+    validate: function(value) {
+      if(!isNaN(value) && value > 0){
+        return true;
+      } else {
+        return "Please enter a stock quantity for new product."
+      }
+    }
+  }])
+  .then(function (answers) {
+    addConfirm(answers);
+  })
+
+}
+
+function addConfirm(res) {
+  header.displayAdd("confirmation", "Ready to Complete", res.product_name, res.department_name, res.price, res.stock_quantity);
+  inquirer.prompt([{
+    name: "confirm_response",
+    type: "list",
+    message: `Are these values correct?`,
+    choices: ["Confirm and Proceed", "Cancel Job and Add A Different Product", "Return to Manager Options"]
+  }])
+  .then(function(answer) {
+    if (answer.confirm_response === `Confirm and Proceed`) {
+      addProduct(res.product_name, res.department_name, res.price, res.stock_quantity)
+    } else if (answer.confirm_response === `Cancel Job and Add A Different Product`) {
+      console.log(`\n Your job has been cancelled.\n`.bold.red);
+      addPrompt();
+    } else {
+      console.log(`\n Your job has been cancelled.\n`.bold.red);
+      promptOptions();
+    }
+  });
+}
+
+function addProduct(productName, departmentName, price, stockQuantity){
+  var query = `INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ("${productName}", "${departmentName}", ${price}, ${stockQuantity})`
+  connection.query(query, function (err, res) {
+    if(err) throw err;
+    header.displayJob("summary", "Job Completion", productName, departmentName, price, stockQuantity)
+    displayProducts(`SELECT * FROM products WHERE product_name="${productName}"`, false);
+  })
+}
