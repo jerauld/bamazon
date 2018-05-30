@@ -69,7 +69,7 @@ module.exports = {
       console.log("════════════════════════════════════════════════════════════════════════════════════════".yellow)
       console.log(" The following department will be created:".bold + "\n");
       console.log(" Department Name:".bold.cyan +  " " + departmentName);
-      console.log(" Overhead Cost:".bold.cyan + " " + overheadCosts + "\n");
+      console.log(" Overhead Cost:".bold.cyan + " " + "$"+overheadCosts + "\n");
       console.log("----------------------------------------------------------------------------------------\n\n".yellow)
     } else if ( type === "summary") {
       console.log(`\n\n ${message}`.bold.green); //Job Compleition
@@ -78,6 +78,11 @@ module.exports = {
       console.log("----------------------------------------------------------------------------------------".green)
       console.log(" Status: ".bold.green + "Success!");
     }
+  },
+
+  tableHeader: function(title) {
+    console.log(`\n\n ${title}`.bold.magenta);
+    console.log("════════════════════════════════════════════════════════════════════════════════════════".magenta)
   }
 
 }

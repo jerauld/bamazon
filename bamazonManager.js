@@ -8,7 +8,7 @@ var table;
 
 function newTable(){
     table = new Table({
-        head: ['Item ID'.bold, 'Product Name'.bold, 'Department Name'.bold, 'Price'.bold, 'Stock Quantity'.bold], 
+        head: ['Item ID'.bold, 'Product Name'.bold, 'Department Name'.bold, 'Price ($)'.bold, 'Stock Quantity'.bold], 
         style: {
         head:[], 
         border:[], 
@@ -47,18 +47,22 @@ function promptOptions() {
         console.log(answer.choice_selection)
         switch (answer.choice_selection) {
             case 'View Products for Sale':
+                header.tableHeader("Products for Sale");
                 displayProducts("SELECT * FROM products", false);
                 break
             case 'View Low Inventory':
+                header.tableHeader("Low Inventory");
                 displayProducts("SELECT * FROM products WHERE stock_quantity < 5", false);
                 break
             case 'Add to Inventory':
+                header.tableHeader("Inventory");
                 displayProducts("SELECT * FROM products", true);
                 break
             case 'Add New Product':
                 addPrompt();
                 break
             case 'Quit':
+                console.log(`\n You are now logged out.\n`.bold.red);
                 connection.end();
                 break
         }

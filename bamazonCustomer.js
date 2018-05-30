@@ -38,7 +38,7 @@ connection.connect(function(err) {
 });
 
 function displayProducts(param) {
-    tableHead = ['Item ID'.bold, 'Product Name'.bold, 'Price'.bold];
+    tableHead = ['Item ID'.bold, 'Product Name'.bold, 'Price ($)'.bold];
     newTable(tableHead);
     connection.query(param, function(err, res) {
       if(err) throw err;
@@ -89,7 +89,7 @@ function promptItemQuantity(id) {
     if (answer.product_quantity > id[0].stock_quantity) {
       insufficientQuantity(answer.product_quantity, id, id[0].product_name, id[0].stock_quantity);
     } else {
-      orderConfirm(answer.product_quantity, id, id[0].product_name, id[0].stock_quantity, id[0].price);
+      orderConfirm(answer.product_quantity, id, id[0].product_name, id[0].stock_quantity, id[0].price, id[0].product_sales);
     }
   });
 }
@@ -114,7 +114,7 @@ function insufficientQuantity(qty, id, product, stock) {
     });
 }
 
-function orderConfirm(qty, id, product, stock, price){
+function orderConfirm(qty, id, product, stock, price, productSales){
   var cost = qty * price;
   header.displayReview("confirmation", "Order Summary", qty, product, price, cost)
   inquirer.prompt([{
@@ -125,7 +125,7 @@ function orderConfirm(qty, id, product, stock, price){
   }])
   .then(function(answer) {
     if (answer.confirm_response === `Place your order.`) {
-      purchaseItem(qty, id, product, stock, price);
+      purchaseItem(qty, id, product, stock, price, productSales);
     } else {
       console.log(`\n Your order has been cancelled.\n`.bold.red);
       keepShopping();
@@ -133,10 +133,11 @@ function orderConfirm(qty, id, product, stock, price){
   });
 }
 
-function purchaseItem(qty, id, product, stock, price){
+function purchaseItem(qty, id, product, stock, price, productSales){
   var newStockQuantity =  stock - qty;
   var cost = qty * price;
-  var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${id[0].item_id}`
+  var newProductSales = productSales + cost;
+  var query = `UPDATE products SET stock_quantity=${newStockQuantity}, product_sales=${newProductSales} WHERE item_id=${id[0].item_id}`
   connection.query(query, function (err, res) {
     if(err) throw err;
     header.displayReview("summary", "Thank You For Your Purchase", qty, product, null, cost)

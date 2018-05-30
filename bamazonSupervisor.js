@@ -7,7 +7,7 @@ var table;
 
 function newTable(){
     table = new Table({
-        head: ['Department ID'.bold, 'Department Name'.bold, 'Overhead Costs'.bold, 'Product Sales'.bold, 'Total Profit'.bold], 
+        head: ['Department ID'.bold, 'Department Name'.bold, 'Overhead Costs ($)'.bold, 'Product Sales ($)'.bold, 'Total Profit ($)'.bold], 
         style: {
         head:[], 
         border:[], 
@@ -46,36 +46,34 @@ function promptOptions() {
         console.log(answer.choice_selection)
         switch (answer.choice_selection) {
             case 'View Product Sales By Department':
+                header.tableHeader("Product Sales By Department");
                 displayDepartments("SELECT d.department_id, d.department_name, d.over_head_costs, SUM(IFNULL(p.product_sales, 0)) AS 'product_sales', (SUM(IFNULL(p.product_sales, 0)) - d.over_head_costs) AS 'total_profit' FROM products p RIGHT JOIN departments d ON p.department_name = d.department_name GROUP BY d.department_id;");
                 break
             case 'Create New Department':
                 addPrompt();
                 break
             case 'Quit':
+                console.log(`\n You are now logged out.\n`.bold.red);
                 connection.end();
                 break
         }
     })
 }
 
-function displayDepartments(param, isAdding) {
+function displayDepartments(param) {
     newTable();
     connection.query(param, function(err, res) {
       if(err) throw err;
       for (var i = 0; i < res.length; i++) {
-        var departmentId = res[i].department_id;
-        var departmentName = res[i].department_name;
-        var overheadCosts = res[i].over_head_costs;
-        var productSales = res[i].product_sales;
-        var totalProfit = res[i].total_profit;
-        table.push([departmentId, departmentName, overheadCosts, productSales, totalProfit]);
+        // var departmentId = res[i].department_id;
+        // var departmentName = res[i].department_name;
+        // var overheadCosts = res[i].over_head_costs;
+        // var productSales = res[i].product_sales;
+        // var totalProfit = res[i].total_profit;
+        table.push([res[i].department_id, res[i].department_name, res[i].over_head_costs, res[i].product_sales, res[i].total_profit]);
       }
     console.log(`\n${table.toString()}\n\n`);
-    if (isAdding === true) {
-        // promptItemId(itemIdArr);
-    } else {
-        promptOptions();
-    }
+    promptOptions();
     });
 }
 
@@ -137,7 +135,7 @@ function addPrompt(){
     connection.query(query, function (err, res) {
       if(err) throw err;
       header.displayCreate("summary", "Job Completion", departmentName, overheadCosts)
-      displayDepartments(`SELECT d.department_id, d.department_name, d.over_head_costs, SUM(IFNULL(p.product_sales, 0)) AS 'product_sales', (SUM(IFNULL(p.product_sales, 0)) - d.over_head_costs) AS 'total_profit' FROM products p RIGHT JOIN departments d ON p.department_name = d.department_name WHERE d.department_name="${departmentName}" GROUP BY d.department_id;`, false);
+      displayDepartments(`SELECT d.department_id, d.department_name, d.over_head_costs, SUM(IFNULL(p.product_sales, 0)) AS 'product_sales', (SUM(IFNULL(p.product_sales, 0)) - d.over_head_costs) AS 'total_profit' FROM products p RIGHT JOIN departments d ON p.department_name = d.department_name WHERE d.department_name="${departmentName}" GROUP BY d.department_id;`);
     })
   }
 
