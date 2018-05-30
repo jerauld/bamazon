@@ -28,7 +28,7 @@ module.exports = {
     }
   },
 
-  displayJob: function(type, message, qty, stock, product, price, newQty, cost) {
+  displayJob: function(type, message, stock, product, price, newQty, cost) {
     console.log(stock);
     if (type === "confirmation") {
       console.log(`\n\n ${message}`.bold.yellow);
@@ -39,7 +39,9 @@ module.exports = {
     } else if ( type === "summary") {
       console.log(`\n\n ${message}`.bold.green);
       console.log("════════════════════════════════════════════════════════════════════════════════════════".green)
-      console.log(` You ordered "${product.cyan.bold}", Qty: ${qty}. ` + `Order total: `.green.bold + `${cost.toFixed(2)}\n\n`.bold);
+      console.log(" The inventory of " + product.cyan.bold + " was changed from " + stock + " to " + newQty + ".");
+      console.log("----------------------------------------------------------------------------------------".green)
+      console.log(" Status: ".bold.green + "Success!");
     }
   },
 

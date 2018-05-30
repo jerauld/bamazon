@@ -45,7 +45,7 @@ function displayProducts(param) {
         table.push([res[i].item_id, res[i].product_name, `$${res[i].price}`]);
         itemIdArr.push(res[i].item_id);
       }
-    console.log(`\n${table.toString()}\n`);
+    console.log(`\n${table.toString()}\n\n`);
     promptItemId(itemIdArr);
     });
 }
@@ -95,7 +95,7 @@ function promptItemQuantity(id) {
 function insufficientQuantity(qty, id, product, stock) {
   inquirer.prompt([{
     name: "proceed_response",
-    type: "rawlist",
+    type: "list",
     message: `Sorry. We have insufficient quantity available to fulfill the order of ${qty} ${product}.`.red + ` There are currently ${stock} ${product} in stock.`.green + `How would you like to proceed?`,
     choices: ["Re-enter the Quantity", "Select a Different Item", "Cancel Order Entirely"]
   }])
@@ -103,7 +103,7 @@ function insufficientQuantity(qty, id, product, stock) {
       if (answer.proceed_response === 'Re-enter the Quantity'){
           promptItemQuantity(id);
       } else if (answer.proceed_response === 'Select a Different Item') {
-        console.log(`\n${table.toString()}\n`);
+        console.log(`\n${table.toString()}\n\n`);
         promptItemId(itemIdArr);
       } else {
         console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.yellow);
@@ -117,7 +117,7 @@ function orderConfirm(qty, id, product, stock, price){
   header.displayOrder("confirmation", "Order Summary", qty, product, price, cost)
   inquirer.prompt([{
     name: "confirm_response",
-    type: "rawlist",
+    type: "list",
     message: `Review your order.`,
     choices: ["Place your order.", "Cancel your order."]
   }])
@@ -144,13 +144,13 @@ function purchaseItem(qty, id, product, stock, price){
 function keepShopping() {
   inquirer.prompt([{
       name: "continue_response",
-      type: "rawlist",
+      type: "list",
       message: `Would you like to continue shopping?`,
       choices: ["Yes", "No"]
     }])
     .then(function(answer) {
       if (answer.continue_response === `Yes`) {
-        console.log(`\n${table.toString()}\n`);
+        console.log(`\n${table.toString()}\n\n`);
         promptItemId(itemIdArr);
       } else {
         console.log(`\n Thank you for shopping with us. We look forward to being of service again soon!\n`.bold.yellow);
