@@ -49,15 +49,32 @@ module.exports = {
       console.log(`\n\n ${message}`.bold.yellow);
       console.log("════════════════════════════════════════════════════════════════════════════════════════".yellow)
       console.log(" The following product will be added to inventory:".bold + "\n");
-      console.log(" Product Name:".bold.cyan + product);
-      console.log(" Department Name:".bold.cyan + department);
-      console.log(" Price:".bold.cyan + price);
-      console.log(" Product Name:".bold.cyan + quantity + "\n");
+      console.log(" Product Name:".bold.cyan +  " " + product);
+      console.log(" Department Name:".bold.cyan +  " " + department);
+      console.log(" Price:".bold.cyan +  " " + price);
+      console.log(" Product Name:".bold.cyan +  " " + quantity + "\n");
       console.log("----------------------------------------------------------------------------------------\n\n".yellow)
     } else if ( type === "summary") {
       console.log(`\n\n ${message}`.bold.green); //Job Compleition
       console.log("════════════════════════════════════════════════════════════════════════════════════════".green)
       console.log(" " + product.cyan.bold + " was added to the inventory");
+      console.log("----------------------------------------------------------------------------------------".green)
+      console.log(" Status: ".bold.green + "Success!");
+    }
+  },
+
+  displayCreate: function(type, message, departmentName, overheadCosts) {
+    if (type === "confirmation") { //Ready to Complete
+      console.log(`\n\n ${message}`.bold.yellow);
+      console.log("════════════════════════════════════════════════════════════════════════════════════════".yellow)
+      console.log(" The following department will be created:".bold + "\n");
+      console.log(" Department Name:".bold.cyan +  " " + departmentName);
+      console.log(" Overhead Cost:".bold.cyan + " " + overheadCosts + "\n");
+      console.log("----------------------------------------------------------------------------------------\n\n".yellow)
+    } else if ( type === "summary") {
+      console.log(`\n\n ${message}`.bold.green); //Job Compleition
+      console.log("════════════════════════════════════════════════════════════════════════════════════════".green)
+      console.log(` The department \"${departmentName}\" was created.`);
       console.log("----------------------------------------------------------------------------------------".green)
       console.log(" Status: ".bold.green + "Success!");
     }

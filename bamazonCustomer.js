@@ -116,7 +116,7 @@ function insufficientQuantity(qty, id, product, stock) {
 
 function orderConfirm(qty, id, product, stock, price){
   var cost = qty * price;
-  header.displayOrder("confirmation", "Order Summary", qty, product, price, cost)
+  header.displayReview("confirmation", "Order Summary", qty, product, price, cost)
   inquirer.prompt([{
     name: "confirm_response",
     type: "list",
@@ -139,7 +139,7 @@ function purchaseItem(qty, id, product, stock, price){
   var query = `UPDATE products SET stock_quantity=${newStockQuantity} WHERE item_id=${id[0].item_id}`
   connection.query(query, function (err, res) {
     if(err) throw err;
-    header.displayOrder("summary", "Thank You For Your Purchase", qty, product, null, cost)
+    header.displayReview("summary", "Thank You For Your Purchase", qty, product, null, cost)
     keepShopping();
   })
 }

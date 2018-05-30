@@ -16,3 +16,10 @@ VALUES ("Echo Dot 2nd Generation", "Electronics", 49.99, 35),
        ("Lodge 10-1/4-Inch Cast Iron Skillet", "Home", 14.88, 1),
        ("Wilson Hyper Hammer 5.3 Tennis Racket", "Sports & Outdoors", 89.00, 4),
        ("Rubik's Cube 4x4", "Toys & Games", 20.48, 6);
+
+INSERT INTO departments (department_name, over_head_costs)
+VALUES ("Electronics", 6000),
+       ("Pets", 4000),
+       ("Home", 5000),
+       ("Sports & Outdoors", 6000),
+       ("Toys & Games", 4000);
