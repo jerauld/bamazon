@@ -23,7 +23,7 @@ UPDATE products SET product_sales=<value> WHERE item_id=<item_id>;
 ```
 
 **Bamazon (MySQL/Node.JS) App Walkthrough (YouTube)**
-[![Bamazon App YouTube Walkthrough](<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonWalkthroughYT.png?raw=true" width=600px"/>)](https://youtu.be/yqo6C9uex50)
+[![Bamazon App YouTube Walkthrough](https://github.com/jerauld/bamazon/blob/master/images/bamazonWalkthroughYT.png?raw=true)](https://youtu.be/yqo6C9uex50)
 
 **App Demo GIFs**
 
