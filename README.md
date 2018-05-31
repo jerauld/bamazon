@@ -28,12 +28,15 @@ UPDATE products SET product_sales=<value> WHERE item_id=<item_id>;
 **App Demo GIFs**
 
 _Bamazon Customer JS_
+
 <img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonCustomerJS.gif?raw=true" width="600px"/>
 
 _Bamazon Manager JS_
+
 <img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonManagerJS.gif?raw=true" width="600px"/>
 
 _Bamazon Supervisor JS_
+
 <img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonSupervisorJS.gif?raw=true" width="600px"/>
 
 **Requirements**
