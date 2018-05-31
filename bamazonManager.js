@@ -8,7 +8,7 @@ var table;
 
 function newTable(){
     table = new Table({
-        head: ['Item ID'.bold, 'Product Name'.bold, 'Department Name'.bold, 'Price ($)'.bold, 'Stock Quantity'.bold], 
+        head: ['Item ID'.bold, 'Product Name'.bold, 'Department Name'.bold, 'Price'.bold, 'Stock Quantity'.bold], 
         style: {
         head:[], 
         border:[], 
