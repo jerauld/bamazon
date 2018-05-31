@@ -23,18 +23,18 @@ UPDATE products SET product_sales=<value> WHERE item_id=<item_id>;
 ```
 
 **Bamazon (MySQL/Node.JS) App Walkthrough (YouTube)**
-(Soon)
+<a href="https://youtu.be/yqo6C9uex50"><img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonWalkthroughYT.png?raw=true" width=600px"/></a>
 
 **App Demo GIFs**
 
-### Bamazon Customer JS ###
-<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonCustomerJS.gif?raw=true" width="600px" text-align="center"/>
+_Bamazon Customer JS_
+<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonCustomerJS.gif?raw=true" width="600px"/>
 
-### Bamazon Manager JS ###
-<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonManagerJS.gif?raw=true" width="600px" text-align="center"/>
+_Bamazon Manager JS_
+<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonManagerJS.gif?raw=true" width="600px"/>
 
-### Bamazon Supervisor JS ###
-<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonSupervisorJS.gif?raw=true" width="600px" text-align="center"/>
+_Bamazon Supervisor JS_
+<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonSupervisorJS.gif?raw=true" width="600px"/>
 
 **Requirements**
 
