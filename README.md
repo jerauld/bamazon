@@ -18,7 +18,9 @@ Bamazon was created for the Node.js & MySQL homework assignment for Berkeley Cod
 
 **Gifs**
 
-<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonCustomerJS.gif?raw=true" width="640px"/>
+<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonCustomerJS.gif?raw=true" width="600px" text-align="center"/>
+<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonManagerJS.gif?raw=true" width="600px" text-align="center"/>
+<img src="https://github.com/jerauld/bamazon/blob/master/images/bamazonSupervisorJS.gif?raw=true" width="600px" text-align="center"/>
 
 **Requirements**
 
