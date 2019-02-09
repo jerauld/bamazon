@@ -18,8 +18,8 @@
   "homepage": "https://github.com/julienshim/bamazon#readme",
   "dependencies": {
     "cli-table": "^0.3.1",
-    "colors": "^1.3.0",
-    "inquirer": "^5.2.0",
-    "mysql": "^2.15.0"
+    "colors": "^1.3.3",
+    "inquirer": "^6.2.2",
+    "mysql": "^2.16.0"
   }
 }
